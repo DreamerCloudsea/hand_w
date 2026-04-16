@@ -20,30 +20,54 @@ def predictDigit(image):
     result = np.argmax(pred[0])
     return result
 
-# Streamlit 
+# ================= UI =================
 st.set_page_config(page_title='Reconocimiento de Dígitos escritos a mano', layout='wide')
+
 st.title('Reconocimiento de Dígitos escritos a mano')
-st.subheader("Dibuja el digito en el panel  y presiona  'Predecir'")
 
-# Add canvas component
-# Specify canvas parameters in application
-drawing_mode = "freedraw"
-stroke_width = st.slider('Selecciona el ancho de línea', 1, 30, 15)
-stroke_color = '#FFFFFF' # Set background color to white
-bg_color = '#000000'
+# 👉 Imagen debajo del título
+st.image(
+    "https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png",
+    caption="Ejemplos de dígitos escritos a mano (MNIST)",
+    width=250
+)
 
-# Create a canvas component
+st.subheader("Dibuja el dígito en el panel y presiona 'Predecir'")
+
+# ================= SIDEBAR =================
+st.sidebar.title("⚙️ Opciones")
+
+# Opciones visuales (NO afectan la lógica)
+stroke_width = st.sidebar.slider('Ancho de línea', 1, 30, 15)
+stroke_color = st.sidebar.color_picker('Color del lápiz', '#FFFFFF')
+bg_color = st.sidebar.color_picker('Color del fondo', '#000000')
+
+# Extras visuales
+drawing_mode = st.sidebar.selectbox(
+    "Modo de dibujo",
+    ("freedraw", "line", "rect", "circle")
+)
+
+st.sidebar.markdown("---")
+st.sidebar.title("Acerca de:")
+st.sidebar.text("En esta aplicación se evalúa")
+st.sidebar.text("la capacidad de una RNA de reconocer") 
+st.sidebar.text("dígitos escritos a mano.")
+st.sidebar.text("Basado en desarrollo de Vinay Uniyal")
+
+# ================= CANVAS =================
 canvas_result = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+    fill_color="rgba(255, 165, 0, 0.3)",
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
     height=200,
     width=200,
+    drawing_mode=drawing_mode,
     key="canvas",
 )
 
-# Add "Predict Now" button
+# ================= BOTÓN =================
 if st.button('Predecir'):
     if canvas_result.image_data is not None:
         input_numpy_array = np.array(canvas_result.image_data)
@@ -51,15 +75,6 @@ if st.button('Predecir'):
         input_image.save('prediction/img.png')
         img = Image.open("prediction/img.png")
         res = predictDigit(img)
-        st.header('El Digito es : ' + str(res))
+        st.header('El Dígito es: ' + str(res))
     else:
-        st.header('Por favor dibuja en el canvas el digito.')
-
-# Add sidebar
-st.sidebar.title("Acerca de:")
-st.sidebar.text("En esta aplicación se evalua ")
-st.sidebar.text("la capacidad de un RNA de reconocer") 
-st.sidebar.text("digitos escritos a mano.")
-st.sidebar.text("Basado en desarrollo de Vinay Uniyal")
-#st.sidebar.text("GitHub Repository")
-#st.sidebar.write("[GitHub Repo Link](https://github.com/Vinay2022/Handwritten-Digit-Recognition)")
+        st.header('Por favor dibuja en el canvas el dígito.')

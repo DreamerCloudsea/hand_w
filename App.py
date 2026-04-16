@@ -39,7 +39,7 @@ st.title('Reconocimiento de Dígitos escritos a mano')
 st.image(
     "https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png",
     caption="Ejemplos de dígitos escritos a mano (MNIST)",
-    width=250
+    width=600
 )
 
 st.subheader("Dibuja el dígito en el panel y presiona 'Predecir'")
@@ -56,10 +56,6 @@ drawing_mode = st.sidebar.selectbox(
     ("freedraw", "line", "rect", "circle")
 )
 
-st.sidebar.markdown("### 📐 Tamaño del tablero")
-canvas_width = st.sidebar.slider("Ancho", 150, 500, 200)
-canvas_height = st.sidebar.slider("Alto", 150, 500, 200)
-
 st.sidebar.markdown("---")
 st.sidebar.title("Acerca de:")
 st.sidebar.text("En esta aplicación se evalúa")
@@ -73,8 +69,8 @@ canvas_result = st_canvas(
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
-    height=canvas_height,
-    width=canvas_width,
+    height=400,
+    width=400,
     drawing_mode=drawing_mode,
     key="canvas",
 )

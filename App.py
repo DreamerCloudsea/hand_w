@@ -40,7 +40,7 @@ st.title('Reconocimiento de Dígitos escritos a mano')
 st.image(
     "https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png",
     caption="Ejemplos de dígitos escritos a mano (MNIST)",
-    width=600
+    width=500
 )
 
 st.subheader("Dibuja el dígito en el panel y presiona 'Predecir'")
@@ -71,8 +71,8 @@ canvas_result = st_canvas(
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
-    height=400,
-    width=400,
+    height=300,
+    width=300,
     drawing_mode=drawing_mode,
     key="canvas",
 )

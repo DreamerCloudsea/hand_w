@@ -20,16 +20,34 @@ def predictDigit(image):
     result = np.argmax(pred[0])
     return result
 
+# 👉 NUEVA función (NO cambia la lógica original)
+def getProbabilities(image):
+    model = tf.keras.models.load_model("model/handwritten.h5")
+    image = ImageOps.grayscale(image)
+    img = image.resize((28,28))
+    img = np.array(img, dtype='float32')
+    img = img/255
+    img = img.reshape((1,28,28,1))
+    pred = model.predict(img)
+    return pred[0]  # vector de 10 probabilidades
+
+# Preview (igual que antes)
+def preprocess_image(image):
+    image = ImageOps.grayscale(image)
+    img = image.resize((28,28))
+    img = np.array(img, dtype='float32')
+    img = img/255
+    return img
+
 # ================= UI =================
 st.set_page_config(page_title='Reconocimiento de Dígitos escritos a mano', layout='wide')
 
 st.title('Reconocimiento de Dígitos escritos a mano')
 
-# 👉 Imagen debajo del título
 st.image(
     "https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png",
     caption="Ejemplos de dígitos escritos a mano (MNIST)",
-    width=250
+    width=600
 )
 
 st.subheader("Dibuja el dígito en el panel y presiona 'Predecir'")
@@ -37,16 +55,18 @@ st.subheader("Dibuja el dígito en el panel y presiona 'Predecir'")
 # ================= SIDEBAR =================
 st.sidebar.title("⚙️ Opciones")
 
-# Opciones visuales (NO afectan la lógica)
 stroke_width = st.sidebar.slider('Ancho de línea', 1, 30, 15)
 stroke_color = st.sidebar.color_picker('Color del lápiz', '#FFFFFF')
 bg_color = st.sidebar.color_picker('Color del fondo', '#000000')
 
-# Extras visuales
 drawing_mode = st.sidebar.selectbox(
     "Modo de dibujo",
     ("freedraw", "line", "rect", "circle")
 )
+
+st.sidebar.markdown("### 📐 Tamaño del tablero")
+canvas_width = st.sidebar.slider("Ancho", 150, 500, 200)
+canvas_height = st.sidebar.slider("Alto", 150, 500, 200)
 
 st.sidebar.markdown("---")
 st.sidebar.title("Acerca de:")
@@ -61,11 +81,21 @@ canvas_result = st_canvas(
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
-    height=200,
-    width=200,
+    height=canvas_height,
+    width=canvas_width,
     drawing_mode=drawing_mode,
     key="canvas",
 )
+
+# ================= PREVIEW =================
+if canvas_result.image_data is not None:
+    input_numpy_array = np.array(canvas_result.image_data)
+    input_image = Image.fromarray(input_numpy_array.astype('uint8'),'RGBA')
+
+    processed_img = preprocess_image(input_image)
+
+    st.markdown("### 🔎 Preview (28x28)")
+    st.image(processed_img, width=150, clamp=True)
 
 # ================= BOTÓN =================
 if st.button('Predecir'):
@@ -74,7 +104,21 @@ if st.button('Predecir'):
         input_image = Image.fromarray(input_numpy_array.astype('uint8'),'RGBA')
         input_image.save('prediction/img.png')
         img = Image.open("prediction/img.png")
+
+        # Resultado principal (igual)
         res = predictDigit(img)
         st.header('El Dígito es: ' + str(res))
+
+        # 👉 NUEVO: Probabilidades
+        probs = getProbabilities(img)
+
+        df = pd.DataFrame({
+            'Dígito': list(range(10)),
+            'Probabilidad': probs
+        })
+
+        st.markdown("### 📊 Probabilidad por cada dígito")
+        st.bar_chart(df.set_index('Dígito'))
+
     else:
         st.header('Por favor dibuja en el canvas el dígito.')

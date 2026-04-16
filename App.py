@@ -20,7 +20,7 @@ def predictDigit(image):
     result = np.argmax(pred[0])
     return result
 
-# 👉 Función para probabilidades
+# Función probabilidades
 def getProbabilities(image):
     model = tf.keras.models.load_model("model/handwritten.h5")
     image = ImageOps.grayscale(image)
@@ -36,6 +36,7 @@ st.set_page_config(page_title='Reconocimiento de Dígitos escritos a mano', layo
 
 st.title('Reconocimiento de Dígitos escritos a mano')
 
+# Imagen de titulo
 st.image(
     "https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png",
     caption="Ejemplos de dígitos escritos a mano (MNIST)",
@@ -58,6 +59,7 @@ drawing_mode = st.sidebar.selectbox(
 
 st.sidebar.markdown("---")
 st.sidebar.title("Acerca de:")
+st.sidebar.text("Fork de Karen Hernández para InterMultim")
 st.sidebar.text("En esta aplicación se evalúa")
 st.sidebar.text("la capacidad de una RNA de reconocer") 
 st.sidebar.text("dígitos escritos a mano.")
@@ -83,11 +85,9 @@ if st.button('Predecir'):
         input_image.save('prediction/img.png')
         img = Image.open("prediction/img.png")
 
-        # Resultado principal
         res = predictDigit(img)
         st.header('El Dígito es: ' + str(res))
 
-        # Probabilidades
         probs = getProbabilities(img)
 
         df = pd.DataFrame({
